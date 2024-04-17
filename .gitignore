@@ -163,3 +163,5 @@ testing/
 arch_1/log.txt
 .circleci
 app.config.js
+
+.idea

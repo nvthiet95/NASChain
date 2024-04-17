@@ -164,14 +164,14 @@ class BaseMinerNeuron(BaseNeuron):
         try:
             while not self.should_exit:
                 while(True):
-                    time.sleep(15)
+                    time.sleep(1)
                     job_info= self.request_job()
                     if job_info:
                         bt.logging.info(f"⏪ Job received for {self.uid}: {job_info}")
                         train_res = self.train_genome(job_info)
                         self.finish_job(self.uid, job_info['Genome_String'], train_res, 3)
                         # print(f"Sleeping for {wait_time} seconds before finishing the job...")
-                        time.sleep(15)  # Sleep for the specified wait time before finishing the job
+                        time.sleep(1)  # Sleep for the specified wait time before finishing the job
                     else:
                         bt.logging.info(f"ℹ️ No jobs are available! Error occurred or all jobs are finished, or the miner joined in the middle of the training epoch.")
 

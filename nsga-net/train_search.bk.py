@@ -31,7 +31,6 @@ device = 'cuda'
 def main(genome, epochs, search_space='micro',
          save='Design_1', expr_root='search', seed=0, gpu=0, init_channels=24,
          layers=11, auxiliary=False, cutout=False, drop_path_prob=0.0):
-    start_time = int(time.time() * 1000)
 
     # ---- train logger ----------------- #
     save_pth = os.path.join(expr_root, '{}'.format(save))
@@ -49,7 +48,7 @@ def main(genome, epochs, search_space='micro',
     momentum = 0.9
     weight_decay = 3e-4
     data_root = '../data'
-    batch_size = 256
+    batch_size = 128
     cutout_length = 16
     auxiliary_weight = 0.4
     grad_clip = 5
@@ -136,18 +135,13 @@ def main(genome, epochs, search_space='micro',
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, int(epochs))
 
-    print(f"Start foreach: {int(int(time.time() * 1000) - start_time)}ms.")
     for epoch in range(epochs):
-        start_time_item = int(time.time() * 1000)
         scheduler.step()
         bt.logging.info(f"👷 epoch {epoch} lr {scheduler.get_lr()[0]}")
         model.droprate = drop_path_prob * epoch / epochs
 
         train_acc, train_obj = train(train_queue, model, criterion, optimizer, train_params)
         bt.logging.info(f'👷 train_acc {train_acc}')
-        print(f"End item foreach: {int(int(time.time() * 1000) - start_time_item)}ms.")
-
-    print(f"End foreach: {int(int(time.time() * 1000) - start_time)}ms.")
 
     valid_acc, valid_obj = infer(valid_queue, model, criterion)
     bt.logging.info(f'👷 valid_acc {valid_acc}', )
@@ -171,8 +165,6 @@ def main(genome, epochs, search_space='micro',
         file.write("valid_acc = {}\n".format(valid_acc))
 
     # logging.info("Architecture = %s", genotype))
-
-    print(f"End main: {int(int(time.time() * 1000) - start_time)}ms.")
 
     return {
         'valid_acc': valid_acc,
@@ -248,6 +240,7 @@ def train(train_queue, net, criterion, optimizer, params):
     # logging.info('train acc %f', 100. * correct / total)
 
     return 100.*correct/total, train_loss/total
+
 
 # def infer(valid_queue, model, criterion):
 #     objs = utils.AvgrageMeter()
